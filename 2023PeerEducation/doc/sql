@@ -1,0 +1,5 @@
+DELETE FROM `trail_results` WHERE exp_name= "T2"
+
+
+SELECT COUNT(*),listing_ass_adopted,listing_ass_proportion,game_name FROM trail_results_view GROUP BY listing_ass_adopted,listing_ass_proportion,game_name
+

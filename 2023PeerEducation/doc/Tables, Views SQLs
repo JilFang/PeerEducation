@@ -1,0 +1,84 @@
+
+DROP TABLE `networks`;
+CREATE TABLE `networks` (
+ `networks_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+ `type` char(2) NOT NULL,
+ `adjlist` text NOT NULL,
+ `byte_num` int(11) UNSIGNED NOT NULL,
+ `agent_num` mediumint(11) UNSIGNED NOT NULL,
+ `avg_degree` float UNSIGNED NOT NULL,
+ `diameter` smallint(11) UNSIGNED NOT NULL,
+ `sw_avg_nb_num` smallint(11) UNSIGNED NULL,
+ `sw_rw_prob` float UNSIGNED NULL,
+ `sf_num_edges_attach` tinyint(3) UNSIGNED NULL,
+ `cm_avg_cm_size` float UNSIGNED NULL,
+ `cm_cm_num` smallint(11) UNSIGNED NULL,
+ `cm_p_in` float UNSIGNED NULL,
+ `cm_p_out` float UNSIGNED NULL,
+ `cm_sd` float UNSIGNED NULL,
+ PRIMARY KEY (`networks_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+
+
+DROP TABLE `trail_parameters`;
+CREATE TABLE `trail_parameters` (
+ `trail_parameters_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+ `networks_id` int(11) UNSIGNED NOT NULL,
+ `game_name` varchar(30) NOT NULL,
+ `listing_ass_adopted` varchar(1000) NOT NULL,
+ `listing_ass_proportion` varchar(1000) NOT NULL,
+ `ass_distribution_type` varchar(100) NOT NULL,
+ `listing_ass_adopted_by_agent_ids` varchar(1000) NULL,
+ `placeholder1` varchar(200) NULL,
+ `placeholder2` varchar(200) NULL,
+ `placeholder3` varchar(200) NULL,
+ `placeholder4` varchar(200) NULL,
+ `placeholder5` varchar(200) NULL,
+ PRIMARY KEY (`trail_parameters_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+
+ `initial_actions_proportion` varchar(100) NOT NULL,
+ `initial_actions` varchar(100) NOT NULL,
+ `ass1` varchar(200) NULL,
+ `ass1_proportion` varchar(10) NULL,
+ `ass2` varchar(200) NULL,
+ `ass2_proportion` varchar(10) NULL,
+
+CREATE TABLE `trail_results` (
+ `trail_results_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+ `trail_parameters_id` int(11) UNSIGNED NOT NULL,
+ `exp_name` varchar(30) NOT NULL,
+ `episode_dynamics` longblob NULL,
+ `episode_num` smallint(5) NULL,
+ PRIMARY KEY (`trail_results_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+
+
+DROP VIEW trail_results_view;
+CREATE VIEW trail_results_view AS
+SELECT trail_results_id, r.trail_parameters_id, exp_name
+, episode_dynamics, episode_num, cvg_joint_behavior
+, n.networks_id, type, sw_avg_nb_num, sw_rw_prob, sf_num_edges_attach, cm_avg_cm_size, cm_cm_num
+, game_name, listing_ass_adopted, listing_ass_proportion, ass_distribution_type
+FROM trail_results r, trail_parameters pa, networks n 
+WHERE r.trail_parameters_id=pa.trail_parameters_id and pa.networks_id=n.networks_id;
+
+
+
+CREATE TABLE `trail_results_mean` (
+ `trail_results_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+ `trail_parameters_id` int(11) UNSIGNED NOT NULL,
+ `exp_name` varchar(30) NOT NULL,
+ `episode_dynamics_mean` longblob NULL,
+ `episode_dynamics_std` longblob NULL,
+ `episode_num` smallint(5) NULL,
+ PRIMARY KEY (`trail_results_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+
+DROP VIEW trail_results_mean_view;
+CREATE VIEW trail_results_mean_view AS
+SELECT trail_results_mean_id, r.trail_parameters_id, exp_name, 
+episode_dynamics_mean, episode_dynamics_std
+, episode_num, repeat_number
+, networks_id, game_name, listing_ass_adopted, listing_ass_proportion, ass_distribution_type
+FROM trail_results_mean r, trail_parameters pa WHERE r.trail_parameters_id=pa.trail_parameters_id;
